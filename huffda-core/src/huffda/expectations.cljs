@@ -25,8 +25,8 @@
   (let [db (sqlite3/Database. ":memory:")
         chan (promise-chan)]
     (go
-      (doseq [promise (map #(run-db-migration db %) db-migrations)]
-        (let [[res err] (<! promise)]
+      (doseq [db-migration db-migrations]
+        (let [[res err] (<! (run-db-migration db db-migration))]
           (if err
             (put! chan [nil err]))))
       (put! chan [{:db db} nil]))
