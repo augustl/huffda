@@ -14,7 +14,7 @@
     "should-work"
     (go
       (let [[db err] (<! (expec/create-memory-database))]
-        (<! (expec/add-expectation db {:key "my-expec-1"}))
+        (<! (expec/add-expectation db {:key "my-expec-1"} 123))
         (is (do (not (<! (expec/is-fulfilled db "my-expec-1")))))
         (<! (expec/fulfill-expectation db "my-expec-1" true))
         (is (do (<! (expec/is-fulfilled db "my-expec-1"))))))))
