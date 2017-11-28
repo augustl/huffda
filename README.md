@@ -31,7 +31,7 @@ The system and the reason is metadata that is used for human consumption to bett
 
 The expectations is typically created by a producer of some sort. The system that actually fulfills the expectation, posts a separate message when it is fulfilled:
 
-```
+```js
 // Fulfillment
 {
   "key": "product-updated-id-43872-version-4",
