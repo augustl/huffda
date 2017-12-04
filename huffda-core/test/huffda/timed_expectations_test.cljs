@@ -72,7 +72,7 @@
       (<! (expec/add-expectation db {:key "my-expec-1" :timeout-ms 123}))
       (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
       (<! (expec/fulfill-expectation db {:key "my-expec-1" :success false}))
-      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success false}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (:is-fulfilled res))
         (is (:is-failed res))
