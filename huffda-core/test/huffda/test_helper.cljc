@@ -16,5 +16,4 @@
              (let [~db-sym db#]
                (do ~@body))
              (fn [_#]
-               (.close (:db db#))
-               (done#))))))))
+               (.close (:db db#) (fn [err#] (done#))))))))))
