@@ -8,7 +8,8 @@
 
 (defn add-expectation [{:keys [db]} {:keys [key timeout-ms reason source]}]
   (let [chan (promise-chan)]
-    (.run db "INSERT INTO expectations (exp_key, created_at, timeout_at, reason, source) VALUES (?, ?, ?, ?, ?)" (clj->js [key (.getTime (js/Date.)) (.getTime (add-millis (js/Date.) timeout-ms)) reason source])
+    (.run db
+          "INSERT INTO expectations (exp_key, created_at, timeout_at, reason, source) VALUES (?, ?, ?, ?, ?)" (clj->js [key (.getTime (js/Date.)) (.getTime (add-millis (js/Date.) timeout-ms)) reason source])
           (fn [err]
             (this-as this
               (if err
@@ -49,22 +50,24 @@
 
 (defn get-expectation [{:keys [db]} expec-key]
   (let [chan (promise-chan)]
-    (.all db "SELECT
-                expectations.exp_key AS exp_key,
-                expectations.created_at AS expectation_created_at,
-                expectations.reason AS expectation_reason,
-                expectations.source AS expectation_source,
-                expectations.timeout_at AS expectation_timeout_at,
-                fulfillments.exp_key AS fulfillment_exp_key,
-                fulfillments.is_success AS fulfillment_is_success,
-                fulfillments.created_at AS fulfillment_created_at,
-                fulfillments.is_success AS fulfillment_is_success,
-                fulfillments.reason AS fulfillment_reason,
-                fulfillments.metadata AS fulfillment_metadata
-              FROM expectations
-              LEFT OUTER JOIN fulfillments ON fulfillments.exp_key = expectations.exp_key
-              WHERE expectations.exp_key = ?
-              GROUP BY fulfillments.is_success" (clj->js [expec-key])
+    (.all db
+          "SELECT
+             expectations.exp_key AS exp_key,
+             expectations.created_at AS expectation_created_at,
+             expectations.reason AS expectation_reason,
+             expectations.source AS expectation_source,
+             expectations.timeout_at AS expectation_timeout_at,
+             fulfillments.exp_key AS fulfillment_exp_key,
+             fulfillments.is_success AS fulfillment_is_success,
+             fulfillments.created_at AS fulfillment_created_at,
+             fulfillments.is_success AS fulfillment_is_success,
+             fulfillments.reason AS fulfillment_reason,
+             fulfillments.metadata AS fulfillment_metadata
+           FROM expectations
+           LEFT OUTER JOIN fulfillments ON fulfillments.exp_key = expectations.exp_key
+           WHERE expectations.exp_key = ?
+           GROUP BY fulfillments.is_success"
+          (clj->js [expec-key])
           (fn [err rows]
             (if err
               (put! chan [nil err])
@@ -74,7 +77,9 @@
 
 (defn fulfill-expectation [{:keys [db]} {:keys [key success reason metadata]}]
   (let [chan (promise-chan)]
-    (.run db "INSERT INTO fulfillments (exp_key, created_at, is_success, reason, metadata) VALUES (?, ?, ?, ?, ?)" (clj->js [key (.getTime (js/Date.)) success reason metadata])
+    (.run db
+          "INSERT INTO fulfillments (exp_key, created_at, is_success, reason, metadata) VALUES (?, ?, ?, ?, ?)"
+          (clj->js [key (.getTime (js/Date.)) success reason metadata])
           (fn [err]
             (if err
               (put! chan [nil err])
