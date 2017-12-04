@@ -78,7 +78,7 @@
         (is (:is-failed res))
         (is (not (:is-timed-out res)))))))
 
-(deftest multiple-expectations-prioritizes-failure
+(deftest multiple-succsessful-fulfillments
   (async-with-db
     db
     (go
