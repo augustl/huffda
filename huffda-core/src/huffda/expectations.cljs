@@ -62,13 +62,13 @@
                 (put! chan [{} nil])))))
     chan))
 
-(defn is-fulfilled [{:keys [db]} expec-key]
+(defn get-expectation [{:keys [db]} expec-key]
   (let [chan (promise-chan)]
     (.get db "SELECT count(*) as c FROM fulfillments WHERE exp_key = ?" (clj->js [expec-key])
           (fn [err row]
             (if err
-              (put! chan false)
-              (put! chan (not (= 0 (.-c row)))))))
+              (put! chan [nil err])
+              (put! chan [{:is-fulfilled (not (= 0 (.-c row)))} nil]))))
     chan))
 
 (defn fulfill-expectation [{:keys [db]} expec-key is-success]
