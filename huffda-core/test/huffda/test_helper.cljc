@@ -9,7 +9,7 @@
 (defmacro async-with-db [db-sym & body]
   `(async done#
      (cljs.core.async/take!
-       (huffda.expectations/create-memory-database)
+       (huffda.expectations-db/create-memory-database)
        (fn [[db# db-err#]]
          (cljs.core.async/take!
            (let [~db-sym db#]

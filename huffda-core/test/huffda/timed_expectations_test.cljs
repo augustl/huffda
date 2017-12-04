@@ -1,6 +1,7 @@
-(ns huffda.expectations-basics-test
+(ns huffda.timed-expectations-test
   (:require [cljs.test :refer [deftest testing is async]]
-            [huffda.expectations :as expec]
+            [huffda.timed-expectations :as expec]
+            huffda.expectations-db
             [cljs.core.async :refer [chan <! >! put! close! alts! timeout promise-chan take!]]
             [huffda.test-helper :refer [test-async]])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]
