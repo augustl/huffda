@@ -10,12 +10,12 @@
   (async-with-db
     db
     (go
-      (<! (expec/add-expectation db "my-expec-1" 123))
+      (<! (expec/add-expectation db {:key "my-expec-1" :timeout-ms 123}))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (not (:is-fulfilled res)))
         (is (not (:is-failed res)))
         (is (not (:is-timed-out res))))
-      (<! (expec/fulfill-expectation db "my-expec-1" true))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (:is-fulfilled res))
         (is (not (:is-failed res)))
@@ -25,8 +25,8 @@
   (async-with-db
     db
     (go
-      (<! (expec/fulfill-expectation db "my-expec-1" true))
-      (<! (expec/add-expectation db "my-expec-1" 123))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
+      (<! (expec/add-expectation db {:key "my-expec-1" :timeout-ms 123}))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (:is-fulfilled res))
         (is (not (:is-failed res)))
@@ -36,7 +36,7 @@
   (async-with-db
     db
     (go
-      (<! (expec/fulfill-expectation db "my-expec-1" true))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (nil? res))
         (is (nil? err))))))
@@ -45,7 +45,7 @@
   (async-with-db
     db
     (go
-      (<! (expec/add-expectation db "my-expec-1" 100))
+      (<! (expec/add-expectation db {:key "my-expec-1" :timeout-ms 100}))
       (<! (timeout 500))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (not (:is-fulfilled res)))
@@ -57,8 +57,8 @@
   (async-with-db
     db
     (go
-      (<! (expec/add-expectation db "my-expec-1" 123))
-      (<! (expec/fulfill-expectation db "my-expec-1" false))
+      (<! (expec/add-expectation db {:key "my-expec-1" :timeout-ms 123}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success false}))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (:is-fulfilled res))
         (is (:is-failed res))
@@ -68,10 +68,10 @@
   (async-with-db
     db
     (go
-      (<! (expec/add-expectation db "my-expec-1" 123))
-      (<! (expec/fulfill-expectation db "my-expec-1" true))
-      (<! (expec/fulfill-expectation db "my-expec-1" false))
-      (<! (expec/fulfill-expectation db "my-expec-1" true))
+      (<! (expec/add-expectation db {:key "my-expec-1" :timeout-ms 123}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success false}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success false}))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (:is-fulfilled res))
         (is (:is-failed res))
@@ -81,10 +81,10 @@
   (async-with-db
     db
     (go
-      (<! (expec/add-expectation db "my-expec-1" 123))
-      (<! (expec/fulfill-expectation db "my-expec-1" true))
-      (<! (expec/fulfill-expectation db "my-expec-1" true))
-      (<! (expec/fulfill-expectation db "my-expec-1" true))
+      (<! (expec/add-expectation db {:key "my-expec-1" :timeout-ms 123}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (:is-fulfilled res))
         (is (not (:is-failed res)))

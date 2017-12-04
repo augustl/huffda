@@ -57,9 +57,9 @@
     (.setTime date (+ (.getTime date) millis))
     date))
 
-(defn add-expectation [{:keys [db]} expec-key timeout-ms]
+(defn add-expectation [{:keys [db]} {:keys [key timeout-ms reason source]}]
   (let [chan (promise-chan)]
-    (.run db "INSERT INTO expectations (exp_key, created_at, timeout_at) VALUES (?, ?, ?)" (clj->js [expec-key (.getTime (js/Date.)) (.getTime (add-millis (js/Date.) timeout-ms))])
+    (.run db "INSERT INTO expectations (exp_key, created_at, timeout_at, reason, source) VALUES (?, ?, ?, ?, ?)" (clj->js [key (.getTime (js/Date.)) (.getTime (add-millis (js/Date.) timeout-ms reason source))])
           (fn [err]
             (this-as this
               (if err
@@ -121,9 +121,9 @@
                           nil]))))
     chan))
 
-(defn fulfill-expectation [{:keys [db]} expec-key is-success]
+(defn fulfill-expectation [{:keys [db]} {:keys [key success reason metadata]}]
   (let [chan (promise-chan)]
-    (.run db "INSERT INTO fulfillments (exp_key, created_at, is_success) VALUES (?, ?, ?)" (clj->js [expec-key (.getTime (js/Date.)) is-success])
+    (.run db "INSERT INTO fulfillments (exp_key, created_at, is_success, reason, metadata) VALUES (?, ?, ?, ?, ?)" (clj->js [key (.getTime (js/Date.)) success reason metadata])
           (fn [err]
             (if err
               (put! chan [nil err])
