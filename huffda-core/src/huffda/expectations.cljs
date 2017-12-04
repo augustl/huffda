@@ -68,7 +68,10 @@
           (fn [err row]
             (if err
               (put! chan [nil err])
-              (put! chan [{:is-fulfilled (not (= 0 (.-c row)))} nil]))))
+              (put! chan [{:is-fulfilled (not (= 0 (.-c row)))
+                           :is-failed false
+                           :is-timed-out false}
+                          nil]))))
     chan))
 
 (defn fulfill-expectation [{:keys [db]} expec-key is-success]

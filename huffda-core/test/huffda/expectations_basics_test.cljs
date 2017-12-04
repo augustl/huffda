@@ -13,7 +13,11 @@
     (go
       (<! (expec/add-expectation db "my-expec-1" 123))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
-        (is (not (:is-fulfilled res))))
+        (is (not (:is-fulfilled res)))
+        (is (not (:is-failed res)))
+        (is (not (:is-timed-out res))))
       (<! (expec/fulfill-expectation db "my-expec-1" true))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
-        (is (:is-fulfilled res))))))
+        (is (:is-fulfilled res))
+        (is (not (:is-failed res)))
+        (is (not (:is-timed-out res)))))))
