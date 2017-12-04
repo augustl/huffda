@@ -54,6 +54,23 @@
         (is (:is-timed-out res))))))
 
 
+(deftest fulfilling-after-timeout
+  (async-with-db
+    db
+    (go
+      (<! (expec/add-expectation db {:key "my-expec-1" :timeout-ms 100}))
+      (<! (timeout 500))
+      (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
+        (is (not (:is-fulfilled res)))
+        (is (not (:is-failed res)))
+        (is (:is-timed-out res)))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
+      (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
+        (is (:is-fulfilled res))
+        (is (not (:is-failed res)))
+        (is (not (:is-timed-out res)))))))
+
+
 (deftest failing-expectation
   (async-with-db
     db
