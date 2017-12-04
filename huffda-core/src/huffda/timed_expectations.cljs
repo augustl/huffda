@@ -8,7 +8,7 @@
 
 (defn add-expectation [{:keys [db]} {:keys [key timeout-ms reason source]}]
   (let [chan (promise-chan)]
-    (.run db "INSERT INTO expectations (exp_key, created_at, timeout_at, reason, source) VALUES (?, ?, ?, ?, ?)" (clj->js [key (.getTime (js/Date.)) (.getTime (add-millis (js/Date.) timeout-ms reason source))])
+    (.run db "INSERT INTO expectations (exp_key, created_at, timeout_at, reason, source) VALUES (?, ?, ?, ?, ?)" (clj->js [key (.getTime (js/Date.)) (.getTime (add-millis (js/Date.) timeout-ms)) reason source])
           (fn [err]
             (this-as this
               (if err
