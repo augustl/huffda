@@ -71,6 +71,7 @@
       (<! (expec/add-expectation db "my-expec-1" 123))
       (<! (expec/fulfill-expectation db "my-expec-1" true))
       (<! (expec/fulfill-expectation db "my-expec-1" false))
+      (<! (expec/fulfill-expectation db "my-expec-1" true))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (:is-fulfilled res))
         (is (:is-failed res))
