@@ -72,19 +72,29 @@
     false
     true))
 
+(defn- get-is-fulfilled [row]
+  (not (nil? (aget row "fulfillment_exp_key"))))
+
+(defn- get-is-timed-out [row now]
+  (> now (aget row "expectation_timeout_at")))
+
 (defn- get-expectation-from-rows [rows now]
   (case (.-length rows)
     0 nil
     1 (let [row (aget rows 0)
-            is-fulfilled (not (nil? (aget row "fulfillment_exp_key")))]
+            is-fulfilled (get-is-fulfilled row)]
         {:is-fulfilled is-fulfilled
          :is-failed (if is-fulfilled
                       (not (num-to-bool (aget row "fulfillment_is_success")))
                       false)
-         :is-timed-out (> now (aget row "expectation_timeout_at"))})
-    {:is-fulfilled false
-     :is-failed false
-     :is-timed-out false}))
+         :is-timed-out (get-is-timed-out row now)})
+    (let [first-row (aget rows 0)
+          is-fulfilled (get-is-fulfilled first-row)]
+      {:is-fulfilled is-fulfilled
+       :is-failed (if (some (fn [row] (not (num-to-bool (aget row "fulfillment_is_success")))) rows)
+                    true
+                    false)
+       :is-timed-out (get-is-timed-out first-row now)})))
 
 (defn get-expectation [{:keys [db]} expec-key]
   (let [chan (promise-chan)]
