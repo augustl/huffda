@@ -1,5 +1,6 @@
 (ns huffda.timed-expectations
-  (:require [cljs.core.async :as async :refer [go chan <! >! put! close! alts! timeout promise-chan]]))
+  (:require [cljs.core.async :as async :refer [go chan <! >! put! close! alts! timeout promise-chan]])
+  (:require-macros [huffda.db-helper :refer [db-promise]]))
 
 (defn add-millis [now millis]
   (let [date (js/Date.)]
@@ -7,15 +8,13 @@
     date))
 
 (defn add-expectation [{:keys [db]} {:keys [key timeout-ms reason source]}]
-  (let [chan (promise-chan)]
-    (.run db
-          "INSERT INTO expectations (exp_key, created_at, timeout_at, reason, source) VALUES (?, ?, ?, ?, ?)" (clj->js [key (.getTime (js/Date.)) (.getTime (add-millis (js/Date.) timeout-ms)) reason source])
-          (fn [err]
-            (this-as this
-              (if err
-                (put! chan [nil err])
-                (put! chan [{} nil])))))
-    chan))
+  (db-promise
+    db
+    run
+    "INSERT INTO expectations (exp_key, created_at, timeout_at, reason, source) VALUES (?, ?, ?, ?, ?)"
+    (clj->js [key (.getTime (js/Date.)) (.getTime (add-millis (js/Date.) timeout-ms)) reason source])
+    [res]
+    {}))
 
 (defn- num-to-bool [num]
   (if (= num 0)
@@ -49,9 +48,10 @@
        :is-timed-out (get-is-timed-out is-fulfilled first-row now)})))
 
 (defn get-expectation [{:keys [db]} expec-key]
-  (let [chan (promise-chan)]
-    (.all db
-          "SELECT
+  (db-promise
+    db
+    all
+    "SELECT
              expectations.exp_key AS exp_key,
              expectations.created_at AS expectation_created_at,
              expectations.reason AS expectation_reason,
@@ -67,21 +67,15 @@
            LEFT OUTER JOIN fulfillments ON fulfillments.exp_key = expectations.exp_key
            WHERE expectations.exp_key = ?
            GROUP BY fulfillments.is_success"
-          (clj->js [expec-key])
-          (fn [err rows]
-            (if err
-              (put! chan [nil err])
-              (put! chan [(get-expectation-from-rows rows (.getTime (js/Date.)))
-                          nil]))))
-    chan))
+    (clj->js [expec-key])
+    [rows]
+    (get-expectation-from-rows rows (.getTime (js/Date.)))))
 
 (defn fulfill-expectation [{:keys [db]} {:keys [key success reason metadata]}]
-  (let [chan (promise-chan)]
-    (.run db
-          "INSERT INTO fulfillments (exp_key, created_at, is_success, reason, metadata) VALUES (?, ?, ?, ?, ?)"
-          (clj->js [key (.getTime (js/Date.)) success reason metadata])
-          (fn [err]
-            (if err
-              (put! chan [nil err])
-              (put! chan [true nil]))))
-    chan))
+  (db-promise
+    db
+    run
+    "INSERT INTO fulfillments (exp_key, created_at, is_success, reason, metadata) VALUES (?, ?, ?, ?, ?)"
+    (clj->js [key (.getTime (js/Date.)) success reason metadata])
+    [res]
+    true))
