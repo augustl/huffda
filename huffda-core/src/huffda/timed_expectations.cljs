@@ -42,9 +42,7 @@
     (let [first-row (aget rows 0)
           is-fulfilled (get-is-fulfilled first-row)]
       {:is-fulfilled is-fulfilled
-       :is-failed (if (some (fn [row] (not (num-to-bool (aget row "fulfillment_is_success")))) rows)
-                    true
-                    false)
+       :is-failed (not (some (fn [row] (num-to-bool (aget row "fulfillment_is_success"))) rows))
        :is-timed-out (get-is-timed-out is-fulfilled first-row now)})))
 
 (defn get-expectation [{:keys [db]} expec-key]

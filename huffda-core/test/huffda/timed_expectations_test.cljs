@@ -82,7 +82,7 @@
         (is (:is-failed res))
         (is (not (:is-timed-out res)))))))
 
-(deftest multiple-expectations-prioritizes-failure
+(deftest multiple-expectations-prioritizes-success
   (async-with-db
     db
     (go
@@ -92,7 +92,7 @@
       (<! (expec/fulfill-expectation db {:key "my-expec-1" :success true}))
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (:is-fulfilled res))
-        (is (:is-failed res))
+        (is (not (:is-failed res)))
         (is (not (:is-timed-out res)))))))
 
 (deftest multiple-succsessful-fulfillments
@@ -106,4 +106,17 @@
       (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
         (is (:is-fulfilled res))
         (is (not (:is-failed res)))
+        (is (not (:is-timed-out res)))))))
+
+(deftest multiple-failed-fulfillments
+  (async-with-db
+    db
+    (go
+      (<! (expec/add-expectation db {:key "my-expec-1" :timeout-ms 123}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success false}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success false}))
+      (<! (expec/fulfill-expectation db {:key "my-expec-1" :success false}))
+      (let [[res err] (<! (expec/get-expectation db "my-expec-1"))]
+        (is (:is-fulfilled res))
+        (is (:is-failed res))
         (is (not (:is-timed-out res)))))))
