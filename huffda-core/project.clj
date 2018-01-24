@@ -16,7 +16,10 @@
                                    :main huffda.main
                                    :parallel-build true
                                    :install-deps true
-                                   :npm-deps {:sqlite3 "3.1.13"}}}
+                                   :npm-deps {:sqlite3 "3.1.13"
+                                              :express "4.16.2"
+                                              :mustache "2.3.0"
+                                              :mustache-express "1.2.5"}}}
 
                        {:id "test"
                         :source-paths ["src" "test"]
