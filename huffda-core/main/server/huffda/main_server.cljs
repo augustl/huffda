@@ -17,6 +17,7 @@
     (.use app (.static express "resources/public"))
     (.engine app "mustache", (mustache-express))
     (.set app "view engine" "mustache")
+    (.set app "view cache" false)
     (.set app "views" "resources/views")
     (.get app "/" (fn [req res] (.render res "index" (clj->js {:thing (get-thing)}))))
     (.listen app 3000 #(js/console.log "Web server started"))
