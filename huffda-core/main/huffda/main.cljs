@@ -1,8 +1,11 @@
-(ns huffda.main
+(ns ^:figwheel-always huffda.main
   (:require [sqlite3]
             [express]
             [mustache-express]
             [cljs.nodejs :as nodejs]))
+
+(defn get-thing []
+  (.random js/Math))
 
 (defn main [& args]
   (nodejs/enable-util-print!)
@@ -15,7 +18,7 @@
     (.engine app "mustache", (mustache-express))
     (.set app "view engine" "mustache")
     (.set app "views" "resources/views")
-    (.get app "/" (fn [req res] (.render res "index" (clj->js {:thing "Love"}))))
+    (.get app "/" (fn [req res] (.render res "index" (clj->js {:thing (get-thing)}))))
     (.listen app 3000 #(js/console.log "Web server started"))
     (prn db)))
 
