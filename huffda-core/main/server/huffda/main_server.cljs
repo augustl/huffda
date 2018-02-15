@@ -1,4 +1,4 @@
-(ns ^:figwheel-always huffda.main
+(ns ^:figwheel-always huffda.main-server
   (:require [sqlite3]
             [express]
             [mustache-express]

@@ -6,16 +6,19 @@
             [lein-doo "0.1.8"]
             [lein-figwheel "0.5.14"]]
 
+  :profiles {:server-dev {:figwheel {:server-port 3550}}
+             :client-dev {:figwheel {:server-port 3560}}}
+
   :cljsbuild {
-              :builds [{:id "main-dev"
-                        :source-paths ["src" "main"]
+              :builds [{:id "main-server-dev"
+                        :source-paths ["src" "main/server"]
                         :figwheel true
                         :compiler {:target :nodejs
-                                   :output-dir "out/main-dev"
-                                   :output-to "out/main-dev/main-with-figwheel.js"
+                                   :output-dir "out/main-server-dev"
+                                   :output-to "out/main-server-dev/main-server-dev-with-figwheel.js"
                                    :optimizations :none
                                    :pretty-print true
-                                   :main huffda.main
+                                   :main huffda.main-server
                                    :parallel-build true
                                    :install-deps true
                                    :npm-deps {:ws "4.0.0"
@@ -24,6 +27,17 @@
                                               :express "4.16.2"
                                               :mustache "2.3.0"
                                               :mustache-express "1.2.5"}}}
+
+                       {:id "main-client-dev"
+                        :source-paths ["main/client"]
+                        :figwheel true
+                        :compiler {:output-to "resources/public/js/huffda.js"
+                                   :output-dir "resources/public/js/out"
+                                   :asset-path "js/out"
+                                   :optimizations :none
+                                   :pretty-print true
+                                   :main huffda.main-client
+                                   :parallel-build true}}
 
                        {:id "test"
                         :source-paths ["src" "test"]
