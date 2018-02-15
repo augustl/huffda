@@ -7,7 +7,8 @@
             [lein-figwheel "0.5.14"]]
 
   :profiles {:server-dev {:figwheel {:server-port 3550}}
-             :client-dev {:figwheel {:server-port 3560}}}
+             :client-dev {:figwheel {:server-port 3560
+                                     :css-dirs ["resources/public/css"]}}}
 
   :cljsbuild {
               :builds [{:id "main-server-dev"
