@@ -10,17 +10,17 @@ Main server.
 * Node.JS (version 6 or newer, probably)
 * Leiningen (the Clojure build tool)
 
-### Compiling
+### Start server
 
-`lein cljsbuild main auto`
+`lein with-profile server-dev figwheel main-server-dev`
 
-or
+Run server
 
-`lein cljsbuild main once`
+`node out/main-server-dev/main-server-dev-with-figwheel.js`
 
-### Running
+### Start client
 
-`node out/main.js`
+`lein with-profile client-dev figwheel main-client-dev`
 
 ### Running tests
 
